@@ -6,9 +6,17 @@ lib-cov
 *.out
 *.pid
 *.gz
+*.sublime-workspace
+*.sublime-project
+*.zip
+*.tern-port
 
 pids
 logs
 results
 
 npm-debug.log
+node_modules
+.DS_STORE
+.sass-cache
+app/public/.sass-cache
