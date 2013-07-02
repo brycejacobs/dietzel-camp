@@ -2,7 +2,6 @@
 
 var express = require('express')
   , config = require('./app/config')
-  , engine = require('ejs-locals')
   , app = module.exports = express();
 
 // Check node_env, if not set default to development
@@ -21,7 +20,6 @@ app.configure('production', function(){
   config.EnvConfig.port = process.env.PORT;
   app.use(express.errorHandler());
 });
-
 
 app.configure(function(){
   app.use(express.compress());
