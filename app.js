@@ -2,7 +2,6 @@
 
 var express = require('express')
   , config = require('./app/config')
-  , engine = require('ejs-locals')
   , app = module.exports = express();
 
 // Check node_env, if not set default to development
@@ -22,19 +21,17 @@ app.configure('production', function(){
   app.use(express.errorHandler());
 });
 
-
 app.configure(function(){
   app.use(express.compress());
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
   app.use(express.static(__dirname + '/app/public'));
-  app.use(express.directory(__dirname + '/public'));
+  app.use(express.directory(__dirname + '/app/public'));
   app.use(app.router);
 });
 
 config.establishDatabaseConnection();
-
 
 app.listen(config.EnvConfig.port, function(){
   console.log("Express server listening on port %d in %s mode", config.EnvConfig.port, app.settings.env);
