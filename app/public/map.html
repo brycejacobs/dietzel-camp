@@ -1,0 +1,134 @@
+ <!DOCTYPE html>
+<html>
+  <head>
+    <title>map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      html, body, #map-canvas {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+    </style>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&key=AIzaSyBkQCRvP_sJ7-buRrAj6G1yS3ikZ4kTsZk"></script>
+  </head>
+  <body>
+    <div>
+      <br>
+      <br>
+      <form>
+        Name: <input type="text" id="name"><br>
+        Email: <input type="text" id="email">
+        <button id="signUp">SignUp!</button>
+      </form>
+    </div>
+    <div>
+      <h1>Find Voting Status</h1>
+      <form>
+      Address: <input type="text" id="addressField">
+      <button id="submit">Query</button>
+      </form>
+    </div>
+    <div id="map-canvas"></div>
+    <script>
+
+      var   address
+          , geoLocation
+          , map
+          , userLocation;
+
+      google.maps.visualRefresh = false;
+
+      function initialize() {
+        var mapOptions = {
+        center: new google.maps.LatLng(91.998,31.093),
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+
+        };
+        map = new google.maps.Map(document.getElementById('map-canvas'),
+            mapOptions);
+
+        var district6Layer = new google.maps.KmlLayer('http://dietzel.co/x14r/la06.kml');
+        district6Layer.setMap(map);
+
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(onLoadGeoLocation);
+        }
+      }
+
+      function onLoadGeoLocation (location) {
+        geoLocation = new google.maps.LatLng(location.coords.latitude,
+                                            location.coords.longitude);
+        var geoMarker = new google.maps.Marker({
+          map: map,
+          draggable: false,
+          animation: google.maps.Animation.DROP,
+          position: geoLocation
+        });
+
+      }
+
+      function saveUserData () {
+        console.log('here');
+        var body = {};
+        if(name.value && email.value) {
+          if(geoLocation) {
+            body.geoLocation = geoLocation;
+          }
+
+          if(userLocation) {
+            body.userLocation = user
+
+          }
+          body.name = name.value;
+          body.email = email.value;
+          body.address = address;
+
+          $.post('/api/maps/save', body, function onPostSuccess(data) {
+            if(data.code === 200) {
+              console.log('Success');
+            }
+          });
+        } else {
+          return;
+        }
+
+
+      }
+
+      google.maps.event.addDomListener(window, 'load', initialize);
+
+      $('#signUp').click(function onSignup () {
+        return saveUserData();
+      });
+
+      $('#submit').click(function onSubmit() {
+        var geocoder = new google.maps.Geocoder();
+        geocoder.geocode(
+              {'address': '' + addressField.value + ',Baton Rouge, LA'}
+            , function onGoogleResult (results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    userLocation = new google.maps.LatLng(results[0].geometry.location.jb,
+                                                          results[0].geometry.location.kb);
+                    var userMarker = new google.maps.Marker({
+                      map: map,
+                      draggable: false,
+                      animation: google.maps.Animation.DROP,
+                      position: userLocation
+                    });
+
+                    address = results[0].formatted_address;
+                } else {
+                    console.log('Error:' + status);
+                }
+            }
+        );
+      });
+
+
+
+    </script>
+  </body>
+</html>

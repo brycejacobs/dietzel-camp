@@ -24,7 +24,6 @@ app.configure('production', function(){
 
 
 app.configure(function(){
-  app.use(require('./express-spa')(app));
   app.use(express.compress());
   app.use(express.bodyParser());
   app.use(express.methodOverride());

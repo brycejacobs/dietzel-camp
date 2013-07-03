@@ -10,20 +10,19 @@
   "dependencies": {
     "async": "~0.2.x",
     "express": "~3.1.x",
+    "jsdom": "~0.6.x",
     "mongoose": "~3.6.x",
     "lodash": "~1.1.x",
     "ejs": "~0.8.x",
     "ejs-locals": "1.0.2",
     "request": "2.16.6",
-    "express-spa-router": "0.0.2",
     "node-schedule": "~0.1.x",
     "passport": "~0.1.16",
     "passport-local": "~0.1.6",
     "validator": "~1.1.x",
     "bcrypt": "~0.7.5",
     "mandrill-api": "~1.0.18",
-    "randpass": "~0.1.0",
-    "zepto" : "0.0.4"
+    "randpass": "~0.1.0"
   },
   "engines": {
     "node": "~0.8.x",
