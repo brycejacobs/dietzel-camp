@@ -9,34 +9,159 @@
         margin: 0;
         padding: 0;
         height: 100%;
+        font-size: 1.0em;
+        background: #f0f0f0;
+      }
+
+      @import url(http://fonts.googleapis.com/css?family=Lato:400,700italic);
+      * { padding: 0; margin: 0; }
+      body { background: #1abc9c; font-family: 'Lato', sans-serif; text-transform: uppercase; letter-spacing: 1px;}
+
+      header {
+          text-align: justify;
+          height: 5em;
+          padding: 1em 5%;
+          background: #34495E;
+          color: #fff;
+      }
+
+      header::after {
+          content: '';
+          display: inline-block;
+          width: 100%;
+      }
+
+      header > div,
+      header > div::before,
+      header nav,
+      header > div h1 {
+          display: inline-block;
+          vertical-align: middle;
+          text-align: left;
+      }
+
+      header > div {
+          height: 100%;
+      }
+
+      header > div::before {
+          content: '';
+          height: 100%;
+      }
+
+      header > div h1 {
+          font-size: 2em;
+          color: #BDC3C7;
+      }
+
+      header nav a {
+          padding: 0 0.6em;
+          white-space: nowrap;
+      }
+
+      header nav a:last-child {
+          padding-right: 0;
+      }
+
+      .form-field {
+        display: inline-block;
+        margin: 0 1em 0 0;
+        font-size: 0.8em;
+      }
+
+      .form-field input[type=text] {
+        width: 12em;
+        height: 1.5em;
+      }
+
+      button {
+        border-radius: 5px;
+        background: #BDC3C7;
+        border: 1px solid #ECF0F1;
+        padding: 0.5em 1em;
+        text-transform: uppercase;
+        margin: 0.5em 0 0 0;
+        float: right;
+      }
+
+      button:hover {
+        background: #ECF0F1;
+      }
+
+      #addressLabel {
+        width: 5.5em;
+      }
+
+      .form-field label {
+        width: 4em;
+        display: inline-block;
+      }
+
+      .form-field div {
+        margin: 0.2em 0 0 0;
+      }
+
+      h1, h3 {
+        color: #F1C40F;
+      }
+
+      @media screen and (max-width: 720px){
+
+          header {
+              height: auto;
+          }
+
+          header > div,
+          header > div h1,
+          header nav {
+              height: auto;
+              width: auto;
+              display: block;
+              text-align: center;
+          }
+
       }
     </style>
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&key=AIzaSyBkQCRvP_sJ7-buRrAj6G1yS3ikZ4kTsZk"></script>
   </head>
   <body>
-    <div>
-      <br>
-      <br>
-      <form>
-        Name: <input type="text" id="name"><br>
-        Email: <input type="text" id="email">
-        <button id="signUp">SignUp!</button>
-      </form>
-    </div>
-    <div>
-      <h1>Find Voting Status</h1>
-      <form>
-      Address: <input type="text" id="addressField">
-      <button id="submit">Query</button>
-      </form>
-    </div>
+    <header>
+    <div><h1>Dietzel</h1></div>
+    <nav>
+        <div class="form-field">
+          <form action="" method="POST" id="signup">
+            <div>
+              <label for="name">Name</label>
+              <input type="text" id="name">
+            </div>
+            <div>
+              <label for="email">Email</label>
+              <input type="text" id="email">
+            </div>
+            <button type="submit">Signup</button>
+          </form>
+        </div>
+        <div class="form-field">
+          <form action="" method="POST" id="checkAddress">
+            <h3>Find Voting Status</h3>
+            <div>
+              <label id="addressLabel" for="address">Address</label>
+              <input type="text" id="address">
+            </div>
+            <button type="submit">Check</button>
+          </form>
+        </div>
+    </nav>
+  </header>
     <div id="map-canvas"></div>
     <script>
 
       var   address
           , geoLocation
           , map
+          , name
+          , email
           , userLocation;
 
       google.maps.visualRefresh = false;
@@ -71,24 +196,30 @@
       }
 
       function saveUserData () {
-        console.log('here');
         var body = {};
-        if(name.value && email.value) {
+        name = $('#name').val();
+        email = $('#email').val();
+        address = $('#address').val();
+        if(name.length && email.length) {
           if(geoLocation) {
-            body.geoLocation = geoLocation;
+            //body.geoLocation = geoLocation;
+            body.geoLocation = { lat: geoLocation.lat(), 'long': geoLocation.lng() };
           }
 
           if(userLocation) {
             body.userLocation = user
 
           }
-          body.name = name.value;
-          body.email = email.value;
+          body.name = name;
+          body.email = email;
           body.address = address;
 
-          $.post('/api/maps/save', body, function onPostSuccess(data) {
-            if(data.code === 200) {
-              console.log('Success');
+          $.ajax({
+            type: 'POST',
+            url: '/api/map/save',
+            data: body,
+            success: function (data) {
+              alert('You have successfully signed up!');
             }
           });
         } else {
@@ -100,14 +231,18 @@
 
       google.maps.event.addDomListener(window, 'load', initialize);
 
-      $('#signUp').click(function onSignup () {
-        return saveUserData();
+      $('#signup').submit(function onSignup (evt) {
+        evt.preventDefault();
+        saveUserData();
+        return false;
       });
 
-      $('#submit').click(function onSubmit() {
+      $('#checkAddress').submit(function onSubmit(evt) {
+        evt.preventDefault();
+
         var geocoder = new google.maps.Geocoder();
         geocoder.geocode(
-              {'address': '' + addressField.value + ',Baton Rouge, LA'}
+              {'address': '' + $('#address').val() + ',Baton Rouge, LA'}
             , function onGoogleResult (results, status) {
                 if (status == google.maps.GeocoderStatus.OK) {
                     userLocation = new google.maps.LatLng(results[0].geometry.location.jb,
@@ -125,6 +260,8 @@
                 }
             }
         );
+
+        return false;
       });
 
 
