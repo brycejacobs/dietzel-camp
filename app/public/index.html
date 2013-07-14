@@ -21,8 +21,9 @@
           text-align: justify;
           height: 5em;
           padding: 1em 5%;
-          background: #34495E;
+          background: #ECF0F1;
           color: #fff;
+          border-bottom: 3px solid #0d6fa8;
       }
 
       header::after {
@@ -34,7 +35,7 @@
       header > div,
       header > div::before,
       header nav,
-      header > div h1 {
+      header > div img {
           display: inline-block;
           vertical-align: middle;
           text-align: left;
@@ -69,23 +70,30 @@
         font-size: 0.8em;
       }
 
+      .form-field label {
+        color: #000;
+      }
+
       .form-field input[type=text] {
         width: 12em;
-        height: 1.5em;
+        height: 1.7em;
+        border: 1px solid #0d6fa8;
+        border-radius: 3px;
       }
 
       button {
         border-radius: 5px;
-        background: #BDC3C7;
-        border: 1px solid #ECF0F1;
+        background: #0d6fa8;
+        border: 1px solid #13a0f2;
         padding: 0.5em 1em;
         text-transform: uppercase;
         margin: 0.5em 0 0 0;
         float: right;
+        color: #fff;
       }
 
       button:hover {
-        background: #ECF0F1;
+        background: #13a0f2;
       }
 
       #addressLabel {
@@ -102,7 +110,7 @@
       }
 
       h1, h3 {
-        color: #F1C40F;
+        color: #C0392B;
       }
 
       @media screen and (max-width: 720px){
@@ -127,7 +135,7 @@
   </head>
   <body>
     <header>
-    <div><h1>Dietzel</h1></div>
+    <div><img src="logo.png" width="200" alt="Dietzel for Congress"></div>
     <nav>
         <div class="form-field">
           <form action="" method="POST" id="signup">
@@ -241,8 +249,12 @@
         evt.preventDefault();
 
         var geocoder = new google.maps.Geocoder();
+        address = $('#address').val();
+        if (address.indexOf(',') === -1) {
+          address += ', Baton Rouge, LA';
+        }
         geocoder.geocode(
-              {'address': '' + $('#address').val() + ',Baton Rouge, LA'}
+              {'address': '' + address }
             , function onGoogleResult (results, status) {
                 if (status == google.maps.GeocoderStatus.OK) {
                     userLocation = new google.maps.LatLng(results[0].geometry.location.jb,
