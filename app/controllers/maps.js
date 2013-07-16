@@ -1,5 +1,6 @@
 var   User = require('./../models/user')
-    , check = require('validator').check;
+    , check = require('validator').check
+    , Q = require('q');
 
 exports.onSave = function onSaveUserData (req, res) {
   var   email
@@ -53,3 +54,20 @@ exports.onSave = function onSaveUserData (req, res) {
     }
   });
 };
+
+exports.onAggregate = function (req, res) {
+  console.log('here');
+  User.find({})
+    .exec()
+    .then(function onFindUsersComplete (users) {
+      return res.send(200, users);
+    }, function onFindUsersFail (error) {
+      return res.send(500, error);
+    });
+};
+
+
+
+
+
+

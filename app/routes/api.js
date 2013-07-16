@@ -7,3 +7,5 @@ app.get('*', function (req, res) { // redirect all others to the index (HTML5 hi
 });
 
 app.post('/api/map/save', maps.onSave);
+
+app.get('/api/users', maps.onAggregate);
