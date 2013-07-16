@@ -147,7 +147,7 @@
               <label for="email">Email</label>
               <input type="text" id="email">
             </div>
-            <button type="submit">Signup</button>
+<!--             <button type="submit">Signup</button> -->
           </form>
         </div>
         <div class="form-field">
@@ -204,50 +204,41 @@
       }
 
       function saveUserData () {
+
         var body = {};
         name = $('#name').val();
         email = $('#email').val();
         address = $('#address').val();
         if(name.length && email.length) {
-          if(geoLocation) {
-            //body.geoLocation = geoLocation;
-            body.geoLocation = { lat: geoLocation.lat(), 'long': geoLocation.lng() };
-          }
-
-          if(userLocation) {
-            body.userLocation = user
-
-          }
           body.name = name;
           body.email = email;
           body.address = address;
-
-          $.ajax({
-            type: 'POST',
-            url: '/api/map/save',
-            data: body,
-            success: function (data) {
-              alert('You have successfully signed up!');
-            }
-          });
-        } else {
-          return;
         }
 
+        if(geoLocation) {
+          body.geoLocation = { lat: geoLocation.lat(), 'long': geoLocation.lng() };
+        }
 
+        if(userLocation) {
+          body.userLocation = { lat: userLocation.lat(), 'long': userLocation.lng() };
+        }
+
+        $.ajax({
+          type: 'POST',
+          url: '/api/map/save',
+          data: body,
+          success: function (data) {
+            alert('You have successfully signed up!');
+          }
+        }).fail(function onPostFail() {
+          alert('Please try correcting the fields or trying again later');
+        });
       }
 
       google.maps.event.addDomListener(window, 'load', initialize);
 
-      $('#signup').submit(function onSignup (evt) {
-        evt.preventDefault();
-        saveUserData();
-        return false;
-      });
-
       $('#checkAddress').submit(function onSubmit(evt) {
         evt.preventDefault();
-
         var geocoder = new google.maps.Geocoder();
         address = $('#address').val();
         if (address.indexOf(',') === -1) {
@@ -267,6 +258,7 @@
                     });
 
                     address = results[0].formatted_address;
+                    saveUserData();
                 } else {
                     console.log('Error:' + status);
                 }
@@ -275,9 +267,6 @@
 
         return false;
       });
-
-
-
     </script>
   </body>
 </html>
