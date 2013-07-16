@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "async": "~0.2.x",
+    "excel-export": "~0.1.2",
     "express": "~3.1.x",
     "jsdom": "~0.6.x",
     "mongoose": "~3.6.x",
