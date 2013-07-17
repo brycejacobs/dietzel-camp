@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dietzel 6th Congressional Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      html, body, #map-canvas {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+    </style>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&key=AIzaSyBkQCRvP_sJ7-buRrAj6G1yS3ikZ4kTsZk"></script>
+  </head>
+  <body>
+    <header>
+    <div><img src="logo.png" width="200" alt="Dietzel for Congress"></div>
+    </header>
+    <a href="/api/users/export">Export Signed Users</a>
+    <div id="map-canvas"></div>
+    <script>
+      var map;
+      google.maps.visualRefresh = false;
+
+      function setUserMarkers(data) {
+        console.log(data);
+
+        for(var i = 0; i < data.length; i++) {
+          var item = data[i];
+          var location;
+
+          if(item.fromInput.googleLocation.latitude && item.fromInput.googleLocation.longitude) {
+            location = new google.maps.LatLng(item.fromInput.googleLocation.latitude, item.fromInput.googleLocation.longitude);
+          } else if(item.geoData.latitude && item.geoData.longitude) {
+            location = new google.maps.LatLng(item.geoData.latitude, item.geoData.longitude);
+          } else {
+            return;
+          }
+
+          var title = "";
+          if(item.fromInput.name) {
+            title += item.fromInput.name;
+          }
+          if(item.fromInput.address) {
+            title + ':' + item.fromInput.address;
+          }
+          if(item.fromInput.email) {
+            title + '-' + item.fromInput.email;
+          }
+
+          new google.maps.Marker({
+            map: map,
+            draggable: false,
+            position: location,
+            title: title
+          });
+        }
+      }
+
+      function getUsers() {
+        $.ajax({
+          type: 'GET',
+          url: '/api/users',
+          data: {},
+          error: function (error) {
+            console.log('error ' + JSON.stringify(error));
+          },
+          success: function (data) {
+            setUserMarkers(data);
+          }
+        }).fail(function onFail(x, r, e) {
+          console.log(e);
+        });
+      }
+
+      function initialize() {
+        var mapOptions = {
+        center: new google.maps.LatLng(91.998,31.093),
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+
+        };
+        map = new google.maps.Map(document.getElementById('map-canvas'),
+            mapOptions);
+
+        var district6Layer = new google.maps.KmlLayer('http://dietzel.co/x14r/la06.kml');
+        district6Layer.setMap(map);
+        getUsers();
+      }
+
+      google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
+  </body>
+</html>
